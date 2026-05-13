@@ -1,12 +1,30 @@
-import React from 'react'
-import Navbar from './../components/Navbar';
+import React from "react";
+import Navbar from "@/components/Navbar";
 
-const page = () => {
+import FeaturesSection from "@/components/FeaturesSection";
+import PreviewSection from "@/components/PreviewSection";
+import TestimonialsSection from "@/components/TestimonialsSection";
+
+import Footer from "@/components/Footer";
+import HeroSection from "@/components/HeroSection";
+import CtaSection from "@/components/CtaSection";
+
+const Page = () => {
   return (
-    <div className=' container mx-auto'>
-      <Navbar/>
-    </div>
-  )
-}
+    <>
+      <Navbar />
+      <main className="container mx-auto">
+        <HeroSection />
+        <FeaturesSection />
+      </main>
+      <PreviewSection />
+      <main className="container mx-auto">
+        <TestimonialsSection />
+        <CtaSection />
+      </main>
+      <Footer />
+    </>
+  );
+};
 
-export default page
+export default Page;
