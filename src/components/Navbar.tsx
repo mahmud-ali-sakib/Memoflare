@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { Button } from "./ui/button";
 import { useState, useEffect } from "react";
 
@@ -46,8 +47,8 @@ const Navbar = () => {
 
         {/* Auth buttons */}
         <div className="flex gap-2">
-          <Button variant="secondary">Log In</Button>
-          <Button>Sign Up</Button>
+          <Button variant="secondary"><Link href={'/login'}>Log In</Link></Button>
+          <Button><Link href={'/signup'}>Sign Up</Link></Button>
         </div>
       </div>
     </nav>
