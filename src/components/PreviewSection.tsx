@@ -18,7 +18,7 @@ const PreviewSection = () => {
         </div>
 
         {/* Main screenshot */}
-        <div className="w-full rounded-3xl border border-border bg-card/50 aspect-[16/9] flex flex-col items-center justify-center gap-3 text-muted-foreground mb-5 backdrop-blur-sm">
+        <div className="w-full rounded-3xl border border-border bg-card/50 aspect-video flex flex-col items-center justify-center gap-3 text-muted-foreground mb-5 backdrop-blur-sm">
           <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center text-xl">
             📊
           </div>
