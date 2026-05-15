@@ -164,7 +164,7 @@ const DashboardPage = () => {
               Recent Notes
             </h2>
             <a
-              href="/dashboard/notes"
+              href="/notes"
               className="text-xs text-primary hover:underline font-medium"
             >
               View all →

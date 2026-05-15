@@ -2,7 +2,7 @@
 import { useState } from "react";
 import NoteEditor, { Note } from "@/components/notes/Editor";
 
-// ── Seed data ──────────────────────────────────────────────────
+
 const SEED_NOTES: Note[] = [
   {
     id: 1,
@@ -68,7 +68,7 @@ const PRESET_TAG_COLORS: Record<string, string> = {
 const getTagColor = (tag: string) =>
   PRESET_TAG_COLORS[tag] ?? "bg-muted/40 text-foreground border-border";
 
-// ── Main page ──────────────────────────────────────────────────
+
 const NotesPage = () => {
   const [notes, setNotes] = useState<Note[]>(SEED_NOTES);
   const [allTags, setAllTags] = useState<string[]>(PRESET_TAGS);

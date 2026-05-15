@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const PreviewSection = () => {
   return (
     <section
@@ -18,25 +20,44 @@ const PreviewSection = () => {
         </div>
 
         {/* Main screenshot */}
-        <div className="w-full rounded-3xl border border-border bg-card/50 aspect-video flex flex-col items-center justify-center gap-3 text-muted-foreground mb-5 backdrop-blur-sm">
-          <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center text-xl">
-            📊
-          </div>
-          <p className="text-sm font-medium">Main dashboard screenshot</p>
-          <p className="text-xs text-muted-foreground/50">Recommended: 1280 × 720px</p>
+        <div className="w-full rounded-3xl border border-border bg-card/50  flex flex-col items-center justify-center gap-3 text-muted-foreground mb-5 backdrop-blur-sm">
+            <Image
+              alt="Dashboard"
+              src="/img/3.png"
+              width={2560}
+              height={1600}
+              sizes="100vw"
+              className="w-full h-auto rounded-3xl"
+              priority
+              unoptimized
+            />
         </div>
 
         {/* Two smaller */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="rounded-3xl border border-border bg-card/50 aspect-video flex flex-col items-center justify-center gap-3 text-muted-foreground">
-            <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center text-lg">🃏</div>
-            <p className="text-sm font-medium">Flashcard study mode</p>
-            <p className="text-xs text-muted-foreground/50">640 × 360px</p>
+          <div className="rounded-3xl border border-border bg-card/50  flex flex-col items-center justify-center gap-3 text-muted-foreground">
+            <Image
+              alt="Dashboard"
+              src="/img/1.png"
+              width={2560}
+              height={1600}
+              sizes="100vw"
+              className="w-full h-auto rounded-3xl"
+              priority
+              unoptimized
+            />
           </div>
-          <div className="rounded-3xl border border-border bg-card/50 aspect-video flex flex-col items-center justify-center gap-3 text-muted-foreground">
-            <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center text-lg">📈</div>
-            <p className="text-sm font-medium">Analytics & progress view</p>
-            <p className="text-xs text-muted-foreground/50">640 × 360px</p>
+          <div className="rounded-3xl border border-border bg-card/50  flex flex-col items-center justify-center gap-3 text-muted-foreground">
+             <Image
+               alt="Dashboard"
+               src="/img/2.png"
+               width={2560}
+               height={1600}
+               sizes="100vw"
+               className="w-full h-auto rounded-3xl"
+               priority
+               unoptimized
+             />
           </div>
         </div>
       </div>

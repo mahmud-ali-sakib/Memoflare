@@ -48,16 +48,18 @@ const HeroSection = () => {
       </div>
 
       {/* Hero image placeholder */}
-     <div className="mt-16 w-full max-w-5xl rounded-3xl border border-border overflow-hidden relative">
-  <Image
-    alt="Dashboard"
-    src="/img/1.png"
-    width={1280}
-    height={800}
-    className="w-full h-auto"
-    priority
-  />
-</div>
+      <div className="mt-16 w-full max-w-5xl rounded-3xl border border-border overflow-hidden relative">
+        <Image
+          alt="Dashboard"
+          src="/img/3.png"
+          width={2560}
+          height={1600}
+          sizes="100vw"
+          className="w-full h-auto rounded-3xl"
+          priority
+          unoptimized
+        />
+      </div>
     </section>
   );
 };
