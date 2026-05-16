@@ -1,13 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 const SignupPage = () => {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const getStrength = (pw: string) => {
     if (pw.length === 0) return 0;
@@ -29,10 +34,31 @@ const SignupPage = () => {
     "bg-emerald-500",
   ][strength];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // handle signup
+    setError(null);
+    setLoading(true);
+    const { error } = await authClient.signUp.email({
+      name,
+      email,
+      password,
+      callbackURL: "/dashboard",
+    });
+    setLoading(false);
+    if (error) {
+      setError(error.message ?? "Sign up failed");
+      return;
+    }
+    router.push("/dashboard");
+    router.refresh();
   };
+
+  const { data: session } = authClient.useSession();
+  useEffect(() => {
+    if (session) {
+      router.replace("/dashboard");
+    }
+  }, [session, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 relative">
@@ -174,8 +200,9 @@ const SignupPage = () => {
             </p>
 
             {/* Submit */}
-            <Button type="submit" className="w-full" size="lg">
-              Create account
+            {error && <p className="text-sm text-rose-400">{error}</p>}
+            <Button type="submit" disabled={loading}>
+              {loading ? "Creating account..." : "Create account"}
             </Button>
           </form>
 

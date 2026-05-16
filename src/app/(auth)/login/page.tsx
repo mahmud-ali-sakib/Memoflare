@@ -1,17 +1,42 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
 
 const LoginPage = () => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // handle login
+    setError(null);
+    setLoading(true);
+    const { error } = await authClient.signIn.email({
+      email,
+      password,
+      callbackURL: "/dashboard",
+    });
+    setLoading(false);
+    if (error) {
+      setError(error.message ?? "Invalid email or password");
+      return;
+    }
+    router.push("/dashboard");
+    router.refresh();
   };
+
+  const { data: session } = authClient.useSession();
+  useEffect(() => {
+    if (session) {
+      router.replace("/dashboard");
+    }
+  }, [session, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative">
@@ -101,8 +126,9 @@ const LoginPage = () => {
             </div>
 
             {/* Submit */}
-            <Button type="submit" className="w-full mt-1" size="lg">
-              Log in
+            {error && <p className="text-sm text-rose-400">{error}</p>}
+            <Button type="submit" disabled={loading}>
+              {loading ? "Logging in..." : "Log in"}
             </Button>
           </form>
 
