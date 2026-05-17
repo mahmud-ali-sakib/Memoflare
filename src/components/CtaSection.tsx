@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "./ui/button";
 
 const CTASection = () => {
@@ -25,10 +26,10 @@ const CTASection = () => {
             card required.
           </p>
           <div className="flex gap-3 justify-center flex-wrap">
-            <Button size="lg">Get started for free</Button>
-            <Button size="lg" variant="outline">
+            <Button size="lg"><Link href={'/login'}>Get started for free</Link></Button>
+            {/* <Button size="lg" variant="outline">
               View on GitHub
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>

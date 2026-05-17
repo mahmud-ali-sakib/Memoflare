@@ -128,7 +128,7 @@ const SideNavbar = () => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push("/login");
+          router.push("/");
           router.refresh();
         },
       },

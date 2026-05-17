@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 const HeroSection = () => {
   return (
@@ -25,10 +26,10 @@ const HeroSection = () => {
 
       {/* CTAs */}
       <div className="flex gap-3 flex-wrap justify-center mb-16">
-        <Button size="lg">Get Started for Free</Button>
-        <Button size="lg" variant="outline">
+        <Button size="lg"><Link href={'/login'}>Get Started for Free</Link></Button>
+        {/* <Button size="lg" variant="outline">
           Live Demo →
-        </Button>
+        </Button> */}
       </div>
 
       {/* Stats row */}
