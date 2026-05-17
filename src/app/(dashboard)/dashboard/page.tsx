@@ -1,100 +1,17 @@
 "use client";
+
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import FocusTimer from "@/components/dashboard/FocusTimer";
-import { useState, useEffect, useRef } from "react";
+import { formatUpdatedAt } from "@/lib/format";
 
-const STAT_CARDS = [
-  {
-    label: "Flashcards reviewed",
-    value: "248",
-    change: "+12 today",
-    positive: true,
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="size-5"
-      >
-        <rect x="2" y="5" width="20" height="14" rx="2" />
-        <line x1="2" y1="10" x2="22" y2="10" />
-      </svg>
-    ),
-    accent: "text-primary bg-primary/10",
-  },
-  {
-    label: "Study streak",
-    value: "7 days",
-    change: "Personal best!",
-    positive: true,
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="size-5"
-      >
-        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-      </svg>
-    ),
-    accent: "text-amber-400 bg-amber-500/10",
-  },
-  {
-    label: "Quizzes taken",
-    value: "34",
-    change: "+3 this week",
-    positive: true,
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="size-5"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-        <line x1="12" y1="17" x2="12.01" y2="17" />
-      </svg>
-    ),
-    accent: "text-emerald-400 bg-emerald-500/10",
-  },
-  {
-    label: "Focus time",
-    value: "3h 20m",
-    change: "Today",
-    positive: true,
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="size-5"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
-      </svg>
-    ),
-    accent: "text-violet-400 bg-violet-500/10",
-  },
-];
-
-const RECENT_NOTES = [
-  { title: "Chapter 4 — Cell Biology", tag: "Biology", time: "2h ago" },
-  { title: "Sorting Algorithms", tag: "CS", time: "Yesterday" },
-  { title: "The French Revolution", tag: "History", time: "2 days ago" },
-  { title: "Quadratic Equations", tag: "Math", time: "3 days ago" },
-];
+type DashboardData = {
+  user: { name: string };
+  stats: { streakDays: number; focusTimeToday: string };
+  dueThisWeek: number;
+  recentNotes: { id: string; title: string; tag: string; updatedAt: string }[];
+  upcoming: { id: string; title: string; date: string; icon: string }[];
+};
 
 const TAG_COLORS: Record<string, string> = {
   Biology: "bg-emerald-500/15 text-emerald-400",
@@ -103,32 +20,129 @@ const TAG_COLORS: Record<string, string> = {
   Math: "bg-violet-500/15 text-violet-400",
 };
 
-const UPCOMING = [
-  { title: "Biology Quiz", date: "Today, 4:00 PM", icon: "◎" },
-  { title: "History Essay due", date: "Tomorrow, 11:59 PM", icon: "❐" },
-  { title: "CS Study group", date: "Fri, 6:00 PM", icon: "◈" },
-];
+const STREAK_ICON = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-5"
+  >
+    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+  </svg>
+);
 
-// ── Page ───────────────────────────────────────────────────────
+const FOCUS_ICON = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-5"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+);
+
 const DashboardPage = () => {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadDashboard = useCallback(async () => {
+    try {
+      const res = await fetch("/api/dashboard");
+      if (!res.ok) throw new Error("Failed");
+      const json: DashboardData = await res.json();
+      setData(json);
+      setError(null);
+    } catch {
+      setError("Could not load dashboard.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/dashboard");
+        if (!res.ok) throw new Error("Failed");
+        const json: DashboardData = await res.json();
+        if (!cancelled) {
+          setData(json);
+          setError(null);
+        }
+      } catch {
+        if (!cancelled) setError("Could not load dashboard.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const greeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return "Good morning";
+    if (h < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
+  const statCards = data
+    ? [
+        {
+          label: "Study streak",
+          value: `${data.stats.streakDays} day${data.stats.streakDays === 1 ? "" : "s"}`,
+          change: data.stats.streakDays > 0 ? "Keep it going!" : "Start today",
+          positive: true,
+          icon: STREAK_ICON,
+          accent: "text-amber-400 bg-amber-500/10",
+        },
+        {
+          label: "Focus time",
+          value: data.stats.focusTimeToday,
+          change: "Today",
+          positive: true,
+          icon: FOCUS_ICON,
+          accent: "text-violet-400 bg-violet-500/10",
+        },
+      ]
+    : [];
+
+  if (loading) {
+    return (
+      <div className="p-8 min-h-screen flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">Loading dashboard...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="p-8 min-h-screen">
-      {/* Header */}
       <div className="mb-8">
         <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
           Overview
         </p>
         <h1 className="font-heading text-3xl font-bold tracking-tight">
-          Good morning, Mahmud
+          {greeting()}, {data?.user.name ?? "there"}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          You have 3 items due this week. Keep it up!
+          {error ??
+            `You have ${data?.dueThisWeek ?? 0} item${data?.dueThisWeek === 1 ? "" : "s"} due this week. Keep it up!`}
         </p>
       </div>
 
-      {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-        {STAT_CARDS.map((card) => (
+        {statCards.map((card) => (
           <div
             key={card.label}
             className="rounded-3xl border border-border bg-card/60 backdrop-blur-sm p-5 flex flex-col gap-3"
@@ -155,27 +169,31 @@ const DashboardPage = () => {
         ))}
       </div>
 
-      {/* Bottom grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent notes — 2 cols */}
         <div className="lg:col-span-2 rounded-3xl border border-border bg-card/60 backdrop-blur-sm p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-heading text-base font-bold tracking-tight">
               Recent Notes
             </h2>
-            <a
+            <Link
               href="/notes"
               className="text-xs text-primary hover:underline font-medium"
             >
               View all →
-            </a>
+            </Link>
           </div>
 
           <div className="flex flex-col gap-1">
-            {RECENT_NOTES.map((note) => (
-              <div
-                key={note.title}
-                className="flex items-center gap-4 p-3 rounded-2xl hover:bg-muted/40 transition-colors cursor-pointer"
+            {data?.recentNotes.length === 0 && (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No notes yet. Create one in Notes.
+              </p>
+            )}
+            {data?.recentNotes.map((note) => (
+              <Link
+                key={note.id}
+                href="/notes"
+                className="flex items-center gap-4 p-3 rounded-2xl hover:bg-muted/40 transition-colors"
               >
                 <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center shrink-0">
                   <svg
@@ -200,36 +218,39 @@ const DashboardPage = () => {
                   </span>
                 </div>
                 <span className="text-xs text-muted-foreground shrink-0">
-                  {note.time}
+                  {formatUpdatedAt(note.updatedAt)}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
 
-        {/* Right column — Upcoming + Focus Timer as separate cards */}
         <div className="flex flex-col gap-6">
-          {/* Focus Timer card */}
-          <FocusTimer />
+          <FocusTimer onSessionComplete={loadDashboard} />
 
-          {/* Upcoming card */}
           <div className="rounded-3xl border border-border bg-card/60 backdrop-blur-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-heading text-base font-bold tracking-tight">
                 Upcoming
               </h2>
-              <a
-                href="/dashboard/calendar"
+              <Link
+                href="/calendar"
                 className="text-xs text-primary hover:underline font-medium"
               >
                 Calendar →
-              </a>
+              </Link>
             </div>
             <div className="flex flex-col gap-2">
-              {UPCOMING.map((item) => (
-                <div
-                  key={item.title}
-                  className="flex items-start gap-3 p-3 rounded-2xl hover:bg-muted/40 transition-colors cursor-pointer"
+              {data?.upcoming.length === 0 && (
+                <p className="text-sm text-muted-foreground py-4 text-center">
+                  No upcoming events this week.
+                </p>
+              )}
+              {data?.upcoming.map((item) => (
+                <Link
+                  key={item.id}
+                  href="/calendar"
+                  className="flex items-start gap-3 p-3 rounded-2xl hover:bg-muted/40 transition-colors"
                 >
                   <div className="h-8 w-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-sm shrink-0">
                     {item.icon}
@@ -240,7 +261,7 @@ const DashboardPage = () => {
                     </p>
                     <p className="text-xs text-muted-foreground">{item.date}</p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

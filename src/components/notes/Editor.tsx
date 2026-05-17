@@ -5,12 +5,12 @@ import { useState } from "react";
 type Tag = string;
 
 interface Note {
-  id: number;
+  id: string;
   title: string;
   body: string;
   tag: Tag;
   pinned: boolean;
-  updatedAt: string;
+  updatedAt: Date;
 }
 
 const PRESET_TAG_COLORS: Record<string, string> = {

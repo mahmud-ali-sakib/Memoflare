@@ -1,13 +1,41 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 
-const FocusTimer = () => {
+type FocusTimerProps = {
+  onSessionComplete?: () => void;
+};
+
+const FocusTimer = ({ onSessionComplete }: FocusTimerProps) => {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(25);
   const [totalSeconds, setTotalSeconds] = useState<number | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [running, setRunning] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const plannedRef = useRef(0);
+  const onCompleteRef = useRef(onSessionComplete);
+
+  useEffect(() => {
+    onCompleteRef.current = onSessionComplete;
+  }, [onSessionComplete]);
+
+  const saveSession = async (completedSeconds: number) => {
+    if (completedSeconds <= 0) return;
+    try {
+      await fetch("/api/focus-sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plannedSeconds: plannedRef.current,
+          completedSeconds,
+          status: "completed",
+        }),
+      });
+      onCompleteRef.current?.();
+    } catch {
+      // session save failed silently
+    }
+  };
 
   const clamp = (val: number, min: number, max: number) =>
     Math.min(max, Math.max(min, val));
@@ -15,6 +43,7 @@ const FocusTimer = () => {
   const start = () => {
     const secs = hours * 3600 + minutes * 60;
     if (secs <= 0) return;
+    plannedRef.current = secs;
     setTotalSeconds(secs);
     setSecondsLeft(secs);
     setRunning(true);
@@ -25,6 +54,7 @@ const FocusTimer = () => {
     setRunning(false);
     setTotalSeconds(null);
     setSecondsLeft(0);
+    plannedRef.current = 0;
   };
 
   useEffect(() => {
@@ -34,6 +64,8 @@ const FocusTimer = () => {
           if (s <= 1) {
             clearInterval(intervalRef.current!);
             setRunning(false);
+            const completed = plannedRef.current;
+            void saveSession(completed);
             return 0;
           }
           return s - 1;

@@ -1,10 +1,10 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 
 import {
   CalendarEvent,
   MONTH_NAMES,
-  SEED_EVENTS,
   toDateKey,
 } from "../../../types/types";
 import CalendarGrid from "@/components/calendar/CalendarGrid";
@@ -15,7 +15,27 @@ const CalendarPage = () => {
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
   const [selectedDate, setSelectedDate] = useState(toDateKey(now));
-  const [events, setEvents] = useState<CalendarEvent[]>(SEED_EVENTS);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/events");
+        if (!res.ok) throw new Error("Failed");
+        const data: CalendarEvent[] = await res.json();
+        if (!cancelled) setEvents(data);
+      } catch {
+        if (!cancelled) setEvents([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const prevMonth = () => {
     if (month === 0) {
@@ -39,15 +59,31 @@ const CalendarPage = () => {
 
   const selectedEvents = events.filter((e) => e.date === selectedDate);
 
-  const addEvent = (ev: CalendarEvent) => setEvents((prev) => [...prev, ev]);
-  const deleteEvent = (id: number) =>
-    setEvents((prev) => prev.filter((e) => e.id !== id));
+  const addEvent = async (ev: Omit<CalendarEvent, "id">) => {
+    const res = await fetch("/api/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(ev),
+    });
+    if (!res.ok) return;
+    const created: CalendarEvent = await res.json();
+    setEvents((prev) => [...prev, created]);
+  };
+
+  const deleteEvent = async (id: string) => {
+    const prev = events;
+    setEvents((e) => e.filter((ev) => ev.id !== id));
+    try {
+      const res = await fetch(`/api/events/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed");
+    } catch {
+      setEvents(prev);
+    }
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* ── Main calendar area ── */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
           <div className="flex items-center gap-4">
             <div>
@@ -61,7 +97,6 @@ const CalendarPage = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Today */}
             <button
               onClick={goToday}
               className="h-8 px-3 rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-muted/40 hover:text-foreground transition-colors"
@@ -69,7 +104,6 @@ const CalendarPage = () => {
               Today
             </button>
 
-            {/* Prev / Next */}
             <div className="flex items-center gap-1">
               <button
                 onClick={prevMonth}
@@ -107,17 +141,21 @@ const CalendarPage = () => {
           </div>
         </div>
 
-        {/* Calendar grid */}
-        <CalendarGrid
-          year={year}
-          month={month}
-          selectedDate={selectedDate}
-          events={events}
-          onSelectDate={setSelectedDate}
-        />
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+            Loading events...
+          </div>
+        ) : (
+          <CalendarGrid
+            year={year}
+            month={month}
+            selectedDate={selectedDate}
+            events={events}
+            onSelectDate={setSelectedDate}
+          />
+        )}
       </div>
 
-      {/* ── Event sidebar ── */}
       <EventSidebar
         selectedDate={selectedDate}
         events={selectedEvents}

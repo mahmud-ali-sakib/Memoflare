@@ -1,7 +1,7 @@
 export type EventColor = "primary" | "emerald" | "amber" | "rose" | "violet" | "cyan";
 
 export interface CalendarEvent {
-  id: number;
+  id: string;
   title: string;
   date: string; // "YYYY-MM-DD"
   time: string; // "HH:MM"
@@ -66,7 +66,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 
 export const SEED_EVENTS: CalendarEvent[] = [
   {
-    id: 1,
+    id: "1",
     title: "Biology Quiz",
     date: `${y}-${m}-${pad(today.getDate())}`,
     time: "09:00",
@@ -75,7 +75,7 @@ export const SEED_EVENTS: CalendarEvent[] = [
     description: "Chapter 4 & 5 — Cell biology and genetics.",
   },
   {
-    id: 2,
+    id: "2",
     title: "CS Study Group",
     date: `${y}-${m}-${pad(today.getDate() + 1)}`,
     time: "14:00",
@@ -84,7 +84,7 @@ export const SEED_EVENTS: CalendarEvent[] = [
     description: "Sorting algorithms and graph traversal prep.",
   },
   {
-    id: 3,
+    id: "3",
     title: "History Essay Due",
     date: `${y}-${m}-${pad(today.getDate() + 2)}`,
     time: "23:59",
@@ -93,7 +93,7 @@ export const SEED_EVENTS: CalendarEvent[] = [
     description: "Submit via the online portal before midnight.",
   },
   {
-    id: 4,
+    id: "4",
     title: "Math Revision",
     date: `${y}-${m}-${pad(today.getDate() + 3)}`,
     time: "10:00",
@@ -102,7 +102,7 @@ export const SEED_EVENTS: CalendarEvent[] = [
     description: "Quadratics, calculus basics, and trigonometry.",
   },
   {
-    id: 5,
+    id: "5",
     title: "Physics Lab",
     date: `${y}-${m}-${pad(today.getDate() + 5)}`,
     time: "13:00",
@@ -111,7 +111,7 @@ export const SEED_EVENTS: CalendarEvent[] = [
     description: "Newton's laws practical experiment.",
   },
   {
-    id: 6,
+    id: "6",
     title: "English Seminar",
     date: `${y}-${m}-${pad(today.getDate() + 7)}`,
     time: "11:00",

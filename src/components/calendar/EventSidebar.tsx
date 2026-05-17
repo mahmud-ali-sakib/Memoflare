@@ -15,8 +15,8 @@ const COLOR_LABELS: Record<EventColor, string> = {
 interface Props {
   selectedDate: string;
   events: CalendarEvent[];
-  onAdd: (e: CalendarEvent) => void;
-  onDelete: (id: number) => void;
+  onAdd: (e: Omit<CalendarEvent, "id">) => void;
+  onDelete: (id: string) => void;
 }
 
 const EventSidebar = ({ selectedDate, events, onAdd, onDelete }: Props) => {
@@ -50,7 +50,6 @@ const EventSidebar = ({ selectedDate, events, onAdd, onDelete }: Props) => {
   const handleAdd = () => {
     if (!title.trim()) return;
     onAdd({
-      id: Date.now(),
       title: title.trim(),
       date: selectedDate,
       time,
