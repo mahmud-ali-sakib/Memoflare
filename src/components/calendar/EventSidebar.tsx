@@ -17,9 +17,10 @@ interface Props {
   events: CalendarEvent[];
   onAdd: (e: Omit<CalendarEvent, "id">) => void;
   onDelete: (id: string) => void;
+  onClose?: () => void;
 }
 
-const EventSidebar = ({ selectedDate, events, onAdd, onDelete }: Props) => {
+const EventSidebar = ({ selectedDate, events, onAdd, onDelete, onClose }: Props) => {
   const [adding, setAdding] = useState(false);
   const [title, setTitle] = useState("");
   const [time, setTime] = useState("09:00");
@@ -63,15 +64,28 @@ const EventSidebar = ({ selectedDate, events, onAdd, onDelete }: Props) => {
   const sorted = [...events].sort((a, b) => a.time.localeCompare(b.time));
 
   return (
-    <div className="w-72 shrink-0 border-l border-border flex flex-col h-full overflow-hidden">
-      {/* Header */}
-      <div className="px-5 py-5 border-b border-border shrink-0">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
-          Selected
-        </p>
-        <h2 className="font-heading text-base font-bold tracking-tight leading-snug">
-          {dateLabel}
-        </h2>
+    <div className="w-full md:w-72 shrink-0 md:border-l border-border flex flex-col h-full overflow-hidden bg-card md:bg-transparent">
+      <div className="px-4 md:px-5 py-4 md:py-5 border-b border-border shrink-0 flex items-start gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+            Selected
+          </p>
+          <h2 className="font-heading text-base font-bold tracking-tight leading-snug">
+            {dateLabel}
+          </h2>
+        </div>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="md:hidden h-8 w-8 shrink-0 rounded-xl hover:bg-muted/60 flex items-center justify-center text-muted-foreground transition-colors"
+            aria-label="Close events"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Events list */}
@@ -105,7 +119,7 @@ const EventSidebar = ({ selectedDate, events, onAdd, onDelete }: Props) => {
               </div>
               <button
                 onClick={() => onDelete(ev.id)}
-                className="shrink-0 h-5 w-5 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-all"
+                className="shrink-0 h-5 w-5 rounded-md flex items-center justify-center opacity-60 md:opacity-0 md:group-hover:opacity-60 hover:!opacity-100 transition-all"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="size-3">
                   <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />

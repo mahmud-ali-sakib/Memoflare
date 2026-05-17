@@ -17,6 +17,7 @@ const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState(toDateKey(now));
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showEventsPanel, setShowEventsPanel] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -55,6 +56,12 @@ const CalendarPage = () => {
     setYear(now.getFullYear());
     setMonth(now.getMonth());
     setSelectedDate(toDateKey(now));
+    setShowEventsPanel(true);
+  };
+
+  const handleSelectDate = (key: string) => {
+    setSelectedDate(key);
+    setShowEventsPanel(true);
   };
 
   const selectedEvents = events.filter((e) => e.date === selectedDate);
@@ -81,33 +88,43 @@ const CalendarPage = () => {
     }
   };
 
+  const eventCount = selectedEvents.length;
+
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
-          <div className="flex items-center gap-4">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                Calendar
-              </p>
-              <h1 className="font-heading text-2xl font-bold tracking-tight leading-tight">
-                {MONTH_NAMES[month]} {year}
-              </h1>
-            </div>
+        <div className="flex items-center justify-between gap-2 px-4 sm:px-6 py-3 sm:py-4 border-b border-border shrink-0">
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Calendar
+            </p>
+            <h1 className="font-heading text-xl sm:text-2xl font-bold tracking-tight leading-tight truncate">
+              {MONTH_NAMES[month]} {year}
+            </h1>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
+              type="button"
+              onClick={() => setShowEventsPanel(true)}
+              className="md:hidden h-8 px-2.5 rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-muted/40 hover:text-foreground transition-colors"
+            >
+              Events{eventCount > 0 ? ` (${eventCount})` : ""}
+            </button>
+            <button
+              type="button"
               onClick={goToday}
-              className="h-8 px-3 rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-muted/40 hover:text-foreground transition-colors"
+              className="h-8 px-2.5 sm:px-3 rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-muted/40 hover:text-foreground transition-colors"
             >
               Today
             </button>
 
             <div className="flex items-center gap-1">
               <button
+                type="button"
                 onClick={prevMonth}
                 className="h-8 w-8 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:bg-muted/40 hover:text-foreground transition-colors"
+                aria-label="Previous month"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -122,8 +139,10 @@ const CalendarPage = () => {
                 </svg>
               </button>
               <button
+                type="button"
                 onClick={nextMonth}
                 className="h-8 w-8 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:bg-muted/40 hover:text-foreground transition-colors"
+                aria-label="Next month"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -151,17 +170,39 @@ const CalendarPage = () => {
             month={month}
             selectedDate={selectedDate}
             events={events}
-            onSelectDate={setSelectedDate}
+            onSelectDate={handleSelectDate}
           />
         )}
       </div>
 
-      <EventSidebar
-        selectedDate={selectedDate}
-        events={selectedEvents}
-        onAdd={addEvent}
-        onDelete={deleteEvent}
-      />
+      <div className="hidden md:flex shrink-0">
+        <EventSidebar
+          selectedDate={selectedDate}
+          events={selectedEvents}
+          onAdd={addEvent}
+          onDelete={deleteEvent}
+        />
+      </div>
+
+      {showEventsPanel && (
+        <>
+          <button
+            type="button"
+            className="md:hidden fixed inset-0 z-30 bg-background/60"
+            aria-label="Close events panel"
+            onClick={() => setShowEventsPanel(false)}
+          />
+          <div className="md:hidden fixed inset-x-0 bottom-20 z-40 max-h-[min(70vh,calc(100dvh-8rem))] rounded-t-3xl border border-border bg-card shadow-xl overflow-hidden flex flex-col">
+            <EventSidebar
+              selectedDate={selectedDate}
+              events={selectedEvents}
+              onAdd={addEvent}
+              onDelete={deleteEvent}
+              onClose={() => setShowEventsPanel(false)}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -73,7 +73,7 @@ const CalendarGrid = ({
         {DAY_NAMES.map((d) => (
           <div
             key={d}
-            className="py-3 text-center text-[11px] font-semibold uppercase tracking-widest text-muted-foreground"
+            className="py-2 sm:py-3 text-center text-[9px] sm:text-[11px] font-semibold uppercase tracking-widest text-muted-foreground"
           >
             {d}
           </div>
@@ -94,7 +94,7 @@ const CalendarGrid = ({
             <button
               key={dateKey}
               onClick={() => onSelectDate(dateKey)}
-              className={`relative flex flex-col p-2 border-b border-r border-border text-left transition-colors min-h-[80px] ${
+              className={`relative flex flex-col p-1 sm:p-2 border-b border-r border-border text-left transition-colors min-h-[52px] sm:min-h-[80px] ${
                 isSelected
                   ? "bg-primary/20"
                   : current
@@ -104,7 +104,7 @@ const CalendarGrid = ({
             >
               {/* Day number */}
               <span
-                className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium mb-1 transition-colors ${
+                className={`inline-flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1 transition-colors ${
                   isToday
                     ? "bg-primary text-primary-foreground font-bold"
                     : isSelected
@@ -118,20 +118,32 @@ const CalendarGrid = ({
               </span>
 
               {/* Event pills — show max 2, then "+N more" */}
-              <div className="flex flex-col gap-0.5 w-full">
-                {dayEvents.slice(0, 2).map((ev) => (
-                  <div
-                    key={ev.id}
-                    className={`truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold border ${COLOR_STYLES[ev.color].pill}`}
-                  >
-                    {ev.title}
-                  </div>
-                ))}
-                {dayEvents.length > 2 && (
-                  <span className="text-[10px] text-muted-foreground pl-1">
-                    +{dayEvents.length - 2} more
+              <div className="flex flex-col gap-0.5 w-full min-w-0">
+                {dayEvents.length > 0 && (
+                  <span className="sm:hidden mt-auto flex gap-0.5 justify-center">
+                    {dayEvents.slice(0, 3).map((ev) => (
+                      <span
+                        key={ev.id}
+                        className={`h-1.5 w-1.5 rounded-full ${COLOR_STYLES[ev.color].dot}`}
+                      />
+                    ))}
                   </span>
                 )}
+                <div className="hidden sm:flex flex-col gap-0.5 w-full">
+                  {dayEvents.slice(0, 2).map((ev) => (
+                    <div
+                      key={ev.id}
+                      className={`truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold border ${COLOR_STYLES[ev.color].pill}`}
+                    >
+                      {ev.title}
+                    </div>
+                  ))}
+                  {dayEvents.length > 2 && (
+                    <span className="text-[10px] text-muted-foreground pl-1">
+                      +{dayEvents.length - 2} more
+                    </span>
+                  )}
+                </div>
               </div>
             </button>
           );

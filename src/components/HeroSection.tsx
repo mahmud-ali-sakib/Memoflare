@@ -11,7 +11,7 @@ const HeroSection = () => {
       </div>
 
       {/* Headline */}
-      <h1 className="font-heading text-6xl md:text-7xl font-bold mb-6 leading-tight tracking-tight max-w-4xl">
+      <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight max-w-4xl">
         Study Smarter,
         <br />
         <span className="text-primary">Not Harder.</span>

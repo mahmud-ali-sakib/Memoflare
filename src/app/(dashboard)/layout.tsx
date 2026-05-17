@@ -17,9 +17,16 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col md:flex-row">
       <SideNavbar />
-      <main className="flex-1 ml-60 min-h-screen">{children}</main>
+      <main className="flex-1 flex flex-col min-h-screen ml-0 md:ml-60 pb-20 md:pb-0">
+        <header className="md:hidden flex h-14 shrink-0 items-center border-b border-border px-4 bg-card/40 backdrop-blur-sm">
+          <span className="font-heading text-base font-bold tracking-tight">
+            Memoflare
+          </span>
+        </header>
+        {children}
+      </main>
     </div>
   );
 }

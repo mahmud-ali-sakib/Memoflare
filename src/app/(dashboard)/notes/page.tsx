@@ -309,7 +309,7 @@ const NotesPage = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex flex-1 min-h-0 overflow-hidden">
       <div
         className={`${showEditor ? "hidden md:flex" : "flex"} w-full md:w-72 lg:w-80 flex-col border-r border-border shrink-0`}
       >

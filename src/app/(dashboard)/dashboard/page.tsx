@@ -120,14 +120,14 @@ const DashboardPage = () => {
 
   if (loading) {
     return (
-      <div className="p-8 min-h-screen flex items-center justify-center">
+      <div className="p-4 sm:p-6 md:p-8 min-h-screen flex items-center justify-center">
         <p className="text-sm text-muted-foreground">Loading dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-8 min-h-screen">
+    <div className="p-4 sm:p-6 md:p-8 min-h-screen">
       <div className="mb-8">
         <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
           Overview
